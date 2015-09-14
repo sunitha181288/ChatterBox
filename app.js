@@ -4,8 +4,11 @@ var express = require('express'),
 	cookieParser = require('cookie-parser'),
 	session = require('express-session'),
 	config = require('./config/config.js'),
-	ConnectMongo = require('connect-mongo')(session)
-	mongoose = require('mongoose').connect(config.dbURL)
+	ConnectMongo = require('connect-mongo')(session),
+	mongoose = require('mongoose').connect(config.dbURL),
+	passport = require('passport'),
+	FacebookStrategy = require('passport-facebook').Strategy
+	
 	
 	app.set('views', path.join(__dirname, 'views'));
 	app.engine('html', require('hogan-express'));
@@ -50,10 +53,11 @@ var express = require('express'),
 		Sunitha.save(function(err){
 			console.log('done');
 		})
+	app.use(passport.initialize());
+app.use(passport.session());	
 		
-		
-		
-	require('./route/route.js')(express , app);
+	require('./auth/passport.js')(passport,FacebookStrategy,config,mongoose);//since passport return fn , so we invoking here	
+	require('./route/route.js')(express , app,passport);
 	app.listen(3000,function(){
 		console.log('ChatBox working on port 3000');
 		console.log("Mode:" +env);
